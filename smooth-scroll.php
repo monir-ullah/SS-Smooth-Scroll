@@ -45,9 +45,10 @@ class SS_Smooth_Scroll {
         register_setting('general', 'ss_smooth_scroll_enabled', [
             'type' => 'string',
             'sanitize_callback' => function($input) {
-                return ($input === 'yes') ? 'yes' : 'no';
+                return ($input === 'yes' || $input === 'on') ? 'yes' : 'no';
             },
             'default' => 'yes',
+            'show_in_rest' => true
         ]);
         register_setting('general', 'ss_smooth_scroll_speed', [
             'type' => 'string',
@@ -56,6 +57,7 @@ class SS_Smooth_Scroll {
                 return (($value >= 0.1) && ($value <= 30000.0)) ? number_format($value, 1) : '5.0';
             },
             'default' => '1.0',
+            'show_in_rest' => true
         ]);
 
         add_settings_section('ss_smooth_scroll_section', '', '__return_null', 'general');
@@ -72,15 +74,24 @@ class SS_Smooth_Scroll {
             <tr>
                 <th><label for="ss_smooth_scroll_enabled">Enable Smooth Scrolling</label></th>
                 <td>
-                    <input type="checkbox" id="ss_smooth_scroll_enabled" <?php checked($enabled, 'yes'); ?>>
+                    <input type="checkbox" name="ss_smooth_scroll_enabled" id="ss_smooth_scroll_enabled" <?php checked($enabled, 'yes'); ?>>
                     <p class="description">Check this box to enable smooth scrolling.</p>
+                    
                 </td>
             </tr>
             <tr>
                 <th><label for="ss_smooth_scroll_speed">Scroll Speed (0.5 - Slow, 1.0 - Normal, 2.0 - Fast)</label></th>
                 <td>
-                    <input type="number" step="0.1" min="0.1"  id="ss_smooth_scroll_speed" value="<?php echo esc_attr($scroll_speed); ?>" class="regular-text">
+                    <input type="number" step="0.1" min="0.1" name="ss_smooth_scroll_speed" id="ss_smooth_scroll_speed" value="<?php echo esc_attr($scroll_speed); ?>" class="regular-text">
                     <p class="description">Adjust the smooth scroll speed.</p>
+                    <div class="contact-info">
+                        <p>
+                        If you need any professional help, feel free to Connect with me:  
+                            <a href="https://www.facebook.com/wpDeveloperMonir" target="_blank">Facebook</a> | 
+                            <a href="https://www.linkedin.com/in/monirullah/" target="_blank">LinkedIn</a> | 
+                            or email me at <a href="mailto:mullah725@gmail.com">mullah725@gmail.com</a>.
+                        </p>
+				    </div>
                 </td>
             </tr>
         </table>

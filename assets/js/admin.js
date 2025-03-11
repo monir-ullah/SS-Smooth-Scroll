@@ -42,11 +42,32 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  // Get the form element
+  const $form = $("#ss_smooth_scroll_section").closest("form");
+
+  // Initialize the visible inputs with current values
+  const isEnabled = $("#ss_smooth_scroll_enabled").prop("checked");
+  const speed = $("#ss_smooth_scroll_speed").val();
+
+  // Update speed input state based on enabled state
+  $("#ss_smooth_scroll_speed").prop("disabled", !isEnabled);
+
   let isChecked = $("#ss_smooth_scroll_enabled").prop("checked");
   $("#ss_smooth_scroll_speed").prop("disabled", !isChecked);
 
+  // Create hidden inputs for our settings
+  $form.append(
+    '<input type="hidden" name="ss_smooth_scroll_enabled" value="' +
+      (isEnabled ? "yes" : "no") +
+      '">'
+  );
+  $form.append(
+    '<input type="hidden" name="ss_smooth_scroll_speed" value="' + speed + '">'
+  );
+
   $("#ss_smooth_scroll_enabled").on("change", function () {
     let isChecked = $(this).prop("checked") ? "yes" : "no";
+    $("input[name='ss_smooth_scroll_enabled']").val(isChecked);
     updateSetting("ss_smooth_scroll_enabled", isChecked);
     $("#ss_smooth_scroll_speed").prop("disabled", isChecked !== "yes");
   });
@@ -54,6 +75,7 @@ jQuery(document).ready(function ($) {
   let timeout;
   $("#ss_smooth_scroll_speed").on("change", function () {
     let speed = $(this).val();
+    $("input[name='ss_smooth_scroll_speed']").val(speed);
     updateSetting("ss_smooth_scroll_speed", speed);
   });
 });
