@@ -1,15 +1,18 @@
 <?php
 /**
- * Plugin Name: SS Smooth Scroll
- * Plugin URI:  https://wordpress.org/plugins/smooth-scrolls/
- * Description: A lightweight plugin that enables smooth scrolling with adjustable speed using Lenis and GSAP.
- * Version:     1.0.2
- * Author:      Monir Ullah
- * Author URI:  https://yourwebsite.com/
- * License:     GPL-2.0+
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: smooth-scrolls
- * Domain Path: /languages
+ * Plugin Name:       SS Smooth Scroll
+ * Plugin URI:        https://wordpress.org/plugins/smooth-scrolls/
+ * Description:       A lightweight plugin that enables smooth scrolling with adjustable speed using Lenis and GSAP.
+ * Version:           1.0.2
+ * Requires at least: 5.2
+ * Requires PHP:      7.2
+ * Author:            Monir Ullah
+ * Author URI:        https://www.linkedin.com/in/monirullah/
+ * License:           GPL-2.0+
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Update URI:        https://wordpress.org/plugins/smooth-scrolls/
+ * Text Domain:       smooth-scrolls
+ * Domain Path:       /languages
  */
 
 if (!defined('ABSPATH')) exit; // Prevent direct access
