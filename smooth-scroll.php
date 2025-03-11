@@ -4,7 +4,7 @@
  * Plugin URI:  https://wordpress.org/plugins/smooth-scrolls/
  * Description: A lightweight plugin that enables smooth scrolling with adjustable speed using Lenis and GSAP.
  * Version:     1.0.2
- * Author:      Your Name
+ * Author:      Monir Ullah
  * Author URI:  https://yourwebsite.com/
  * License:     GPL-2.0+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
