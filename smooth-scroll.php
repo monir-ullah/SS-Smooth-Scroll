@@ -68,7 +68,7 @@ class SS_Smooth_Scroll {
             <tr>
                 <th><label for="ss_smooth_scroll_speed">Scroll Speed (0.5 - Slow, 1.0 - Normal, 2.0 - Fast)</label></th>
                 <td>
-                    <input type="number" step="0.1" min="0.1" max="5" id="ss_smooth_scroll_speed" value="<?php echo esc_attr($scroll_speed); ?>" class="regular-text">
+                    <input type="number" step="0.1" min="0.1"  id="ss_smooth_scroll_speed" value="<?php echo esc_attr($scroll_speed); ?>" class="regular-text">
                     <p class="description">Adjust the smooth scroll speed.</p>
                     <p>
                       If you need any professional help, feel free to Connect with me:  
