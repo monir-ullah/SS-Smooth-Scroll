@@ -10,44 +10,51 @@
  * Author URI:        https://www.linkedin.com/in/monirullah/
  * License:           GPL-2.0+
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Update URI:        https://wordpress.org/plugins/smooth-scrolls/
  * Text Domain:       smooth-scrolls
  * Domain Path:       /languages
  */
 
-if (!defined('ABSPATH')) exit; // Prevent direct access
+if (!defined('ABSPATH')) exit;
 
 class SS_Smooth_Scroll {
     private static $instance = null;
 
     private function __construct() {
+        register_activation_hook(__FILE__, [$this, 'plugin_activated']);
+        add_action('admin_init', [$this, 'redirect_after_activation']);
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('wp_ajax_save_smooth_scroll_settings', [$this, 'save_settings']);
-        add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_plugin_action_links']);
     }
 
-    public function load_plugin_textdomain() {
-        load_plugin_textdomain('smooth-scrolls', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    public function plugin_activated() {
+        set_transient('ss_smooth_scroll_activation_redirect', true, 30);
     }
 
-    public static function get_instance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
+    public function redirect_after_activation() {
+        if (get_transient('ss_smooth_scroll_activation_redirect')) {
+            delete_transient('ss_smooth_scroll_activation_redirect');
+            wp_safe_redirect(admin_url('options-general.php#ss_smooth_scroll_section'));
+            exit;
         }
-        return self::$instance;
     }
 
     public function register_settings() {
         register_setting('general', 'ss_smooth_scroll_enabled', [
             'type' => 'string',
-            'sanitize_callback' => 'sanitize_text_field',
+            'sanitize_callback' => function($input) {
+                return ($input === 'yes') ? 'yes' : 'no';
+            },
             'default' => 'yes',
         ]);
         register_setting('general', 'ss_smooth_scroll_speed', [
             'type' => 'string',
-            'sanitize_callback' => 'sanitize_text_field',
+            'sanitize_callback' => function($input) {
+                $value = floatval($input);
+                return (($value >= 0.1) && ($value <= 30000.0)) ? number_format($value, 1) : '5.0';
+            },
             'default' => '1.0',
         ]);
 
@@ -58,9 +65,10 @@ class SS_Smooth_Scroll {
     public function settings_field() {
         $scroll_speed = get_option('ss_smooth_scroll_speed', '1.0');
         $enabled = get_option('ss_smooth_scroll_enabled', 'yes');
+
         ?>
         <h2>SS Smooth Scroll Settings</h2>
-        <table class="form-table">
+        <table class="form-table" id="ss_smooth_scroll_section">
             <tr>
                 <th><label for="ss_smooth_scroll_enabled">Enable Smooth Scrolling</label></th>
                 <td>
@@ -73,12 +81,6 @@ class SS_Smooth_Scroll {
                 <td>
                     <input type="number" step="0.1" min="0.1"  id="ss_smooth_scroll_speed" value="<?php echo esc_attr($scroll_speed); ?>" class="regular-text">
                     <p class="description">Adjust the smooth scroll speed.</p>
-                    <p>
-                      If you need any professional help, feel free to Connect with me:  
-                        <a href="https://www.facebook.com/wpDeveloperMonir" target="_blank">Facebook</a> | 
-                        <a href="https://www.linkedin.com/in/monirullah/" target="_blank">LinkedIn</a> | 
-                        or email me at <a href="mailto:mullah725@gmail.com">mullah725@gmail.com</a>.
-                    </p>
                 </td>
             </tr>
         </table>
@@ -97,15 +99,12 @@ class SS_Smooth_Scroll {
     public function enqueue_scripts() {
         if (get_option('ss_smooth_scroll_enabled', 'yes') !== 'yes') return;
 
-        // Enqueue local copies of scripts
         wp_enqueue_script('ss-lenis', plugin_dir_url(__FILE__) . 'assets/js/lenis.min.js', [], '1.2.3', true);
         wp_enqueue_script('ss-gsap', plugin_dir_url(__FILE__) . 'assets/js/gsap.min.js', [], '3.12.5', true);
         wp_enqueue_script('ss-scrolltrigger', plugin_dir_url(__FILE__) . 'assets/js/ScrollTrigger.min.js', ['ss-gsap'], '3.12.5', true);
 
-        // Initialize Lenis on frontend
         $scroll_speed = esc_attr(get_option('ss_smooth_scroll_speed', '1.0'));
         wp_add_inline_script('ss-lenis', "
-            console.log('SS Smooth Scroll Frontend Script Loaded');
             document.addEventListener('DOMContentLoaded', function () {
                 const lenis = new Lenis({ duration: {$scroll_speed} });
 
@@ -130,6 +129,19 @@ class SS_Smooth_Scroll {
         }
         echo json_encode(['success' => false, 'message' => 'Invalid request.']);
         wp_die();
+    }
+
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function add_plugin_action_links($links) {
+        $settings_link = '<a href="' . admin_url('options-general.php#ss_smooth_scroll_section') . '" style="color: #0073aa; font-weight: bold;">Settings</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 }
 
