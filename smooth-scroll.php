@@ -12,6 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       smooth-scrolls
  * Domain Path:       /languages
+ * 
  */
 
 if (!defined('ABSPATH')) exit;
@@ -44,18 +45,13 @@ class SS_Smooth_Scroll {
     public function register_settings() {
         register_setting('general', 'ss_smooth_scroll_enabled', [
             'type' => 'string',
-            'sanitize_callback' => function($input) {
-                return ($input === 'yes' || $input === 'on') ? 'yes' : 'no';
-            },
+            'sanitize_callback' => [$this, 'ss_smooth_scroll_sanitize_enabled'],
             'default' => 'yes',
             'show_in_rest' => true
         ]);
         register_setting('general', 'ss_smooth_scroll_speed', [
-            'type' => 'string',
-            'sanitize_callback' => function($input) {
-                $value = floatval($input);
-                return (($value >= 0.1) && ($value <= 30000.0)) ? number_format($value, 1) : '5.0';
-            },
+            'type' => 'number',
+            'sanitize_callback' => [$this, 'ss_smooth_scroll_sanitize_speed'],
             'default' => '1.0',
             'show_in_rest' => true
         ]);
@@ -64,6 +60,35 @@ class SS_Smooth_Scroll {
         add_settings_field('ss_smooth_scroll_enabled', 'Enable Smooth Scroll', [$this, 'settings_field'], 'general', 'ss_smooth_scroll_section');
     }
 
+    // Sanitization functions
+
+    public function ss_smooth_scroll_sanitize_speed($input) {
+        if (is_null($input) || $input === '') {
+            return '1.0';
+        }
+        if (!is_numeric($input)) {
+            return '1.0';
+        }
+        $value = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        if ($value === false) {
+            return '1.0';
+        }
+        $value = floatval($value);
+        if ($value < 0.1 || $value > 30000.0 || !is_finite($value)) {
+            return '1.0';
+        }
+        return number_format($value, 1);
+    }
+    public function ss_smooth_scroll_sanitize_enabled($input) {
+        if (is_null($input) || $input === '') {
+            return 'no';
+        }
+        if (!is_string($input)) {
+            return 'no';
+        }
+        $input = strtolower(trim($input));
+        return in_array($input, ['yes', 'no'], true) ? $input : 'no';
+    }
     public function settings_field() {
         $scroll_speed = get_option('ss_smooth_scroll_speed', '1.0');
         $enabled = get_option('ss_smooth_scroll_enabled', 'yes');
